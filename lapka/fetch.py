@@ -21,14 +21,19 @@ class SchroniskoWroclawPl:
         if session:
             self.session = session
 
-        animals = []
-        async for a_url in self._animals_urls():  # TODO Create tasks and run them at once
+        async def task(a_url):
             async with self.session.get(a_url) as resp:
                 content = await resp.text()
             data = self._parse(content)
             data['url'] = a_url
-            animals.append(data)
-        return animals
+            return data
+
+        coros = []
+        # TODO Pyflakes doesn't support async comprehension
+        async for a_url in self._animals_urls():
+            coros.append(task(a_url))
+
+        return await asyncio.gather(*coros)
 
     async def _animals_urls(self):
         url = self.start_url

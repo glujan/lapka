@@ -116,6 +116,8 @@ class TestSchroniskoWroclawPl(unittest.TestCase, metaclass=AsyncMeta):
 
     async def test__animals_urls(self):
         animals = ['http://schroniskowroclaw.pl/displaywp_project/burbon-22117/',
+                   'http://schroniskowroclaw.pl/displaywp_project/nelson-10117/',
+                   'http://schroniskowroclaw.pl/displaywp_project/burbon-22117/',
                    'http://schroniskowroclaw.pl/displaywp_project/nelson-10117/']
         urls = []
 
