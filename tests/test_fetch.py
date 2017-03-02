@@ -1,8 +1,9 @@
-import asyncio
 import unittest
 from unittest import mock
+from urllib.parse import urlparse
 
 from aiohttp import ClientSession
+from lxml.etree import XPath, XPathSyntaxError
 
 from tests.utils import AsyncMeta, fake_response as f_resp
 from lapka import fetch
@@ -113,6 +114,17 @@ class TestSchroniskoWroclawPl(unittest.TestCase, metaclass=AsyncMeta):
     @unittest.skip
     async def test_parse(self):
         self.fail()
+
+    def test_class_attributes(self):
+        try:
+            XPath(self.shelter.animal_url)
+            XPath(self.shelter.next_url)
+        except XPathSyntaxError as e:
+            self.fail(e.msg)
+
+        url = urlparse(self.shelter.start_url)
+        self.assertIn(url.scheme, ('http', 'https'))
+        self.assertTrue(url.netloc)
 
     async def test__animals_urls(self):
         animals = ['http://schroniskowroclaw.pl/displaywp_project/burbon-22117/',

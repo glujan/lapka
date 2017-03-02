@@ -21,11 +21,11 @@ class SchroniskoWroclawPl:
         if session:
             self.session = session
 
-        async def task(a_url):
-            async with self.session.get(a_url) as resp:
+        async def task(url):
+            async with self.session.get(url) as resp:
                 content = await resp.text()
             data = self._parse(content)
-            data['url'] = a_url
+            data['url'] = url
             return data
 
         coros = []
@@ -53,7 +53,6 @@ class SchroniskoWroclawPl:
                 url = None
 
     def _parse(self, content):
-        name = ''
         try:
             doc = etree.HTML(content).xpath("//*[@class='project']")[0]
             name = doc.xpath("//div[@class='project-details']//h1/text()")[0].split(' ')[0]
