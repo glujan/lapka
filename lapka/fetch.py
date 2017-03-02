@@ -1,8 +1,44 @@
 """Fetch and parse data from shelters' websites to a common format."""
 import asyncio
+import json
+from http import HTTPStatus
+from urllib.parse import unquote
 
 import aiohttp
+import aiohttp.web
 from lxml import etree
+
+
+class Fetcher(dict):
+    def __init__(self, session=None, *args, **kwargs):
+        self._session = session
+        self._loop = asyncio.get_event_loop()
+        self._sem = asyncio.Semaphore(100)
+        super().__init__(*args, **kwargs)
+
+    async def fetch(self, request):
+        url = unquote(request.match_info.get('url', ''))
+
+        if not url:
+            status, data = HTTPStatus.BAD_REQUEST, None
+        else:
+            status, data = await self._do_stuff(url)
+
+        return aiohttp.web.Response(status=status, text=json.dumps(data))
+
+    async def _do_stuff(self, url):
+        parser = self.get(url, None)
+        if not parser:
+            return HTTPStatus.NOT_ACCEPTABLE, None
+
+        data = []
+
+        async with self._sem:
+            data = await parser.parse()
+
+        status = HTTPStatus.OK  # FIXME Set valid status
+
+        return status, data
 
 
 class SchroniskoWroclawPl:
@@ -70,15 +106,16 @@ class SchroniskoWroclawPl:
         return data
 
 
-async def _main():
-    async with aiohttp.ClientSession() as session:
-        shelter = SchroniskoWroclawPl()
-        animals = await shelter.parse(session)
+def _main():
+    with aiohttp.ClientSession() as session:
+        handler = Fetcher(session, {
+            'schroniskowroclaw.pl': SchroniskoWroclawPl(session),
+        })
 
-    print('Gathered {} animals'.format(len(animals)))
+        app = aiohttp.web.Application()
+        app.router.add_get("/fetch/{url}", handler.fetch)
+        aiohttp.web.run_app(app)
 
 
 if __name__ == '__main__':
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(_main())
-    loop.close()
+    _main()
