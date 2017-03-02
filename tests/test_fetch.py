@@ -1,5 +1,5 @@
 import unittest
-from unittest import mock
+from unittest.mock import patch
 from urllib.parse import urlparse
 
 from aiohttp import ClientSession
@@ -106,25 +106,35 @@ animal_html = '''
 '''
 
 
-class TestSchroniskoWroclawPl(unittest.TestCase, metaclass=AsyncMeta):
-
+class TestShelter(unittest.TestCase, metaclass=AsyncMeta):
     def setUp(self):
-        self.shelter = fetch.SchroniskoWroclawPl()
+        self.shelter = fetch.Shelter()
 
-    @unittest.skip
     async def test_parse(self):
-        self.fail()
+        urls = ['1', '2', '3']
 
-    def test_class_attributes(self):
-        try:
-            XPath(self.shelter.animal_url)
-            XPath(self.shelter.next_url)
-        except XPathSyntaxError as e:
-            self.fail(e.msg)
+        async def dummy_urls(*args):
+            for u in urls:
+                yield u
 
-        url = urlparse(self.shelter.start_url)
-        self.assertIn(url.scheme, ('http', 'https'))
-        self.assertTrue(url.netloc)
+        mock_parse = patch.object(self.shelter, '_parse', return_value={}).start()
+        mock_urls = patch.object(self.shelter, '_animals_urls', side_effect=dummy_urls).start()
+
+        with patch.object(ClientSession, 'get', return_value=f_resp(all_animals)) as mock_get:
+            async with ClientSession() as session:
+                resp = await self.shelter.parse(session)
+
+        self.assertIsInstance(resp, list)
+        self.assertEqual(len(resp), len(urls))
+        self.assertEqual(mock_get.call_count, len(urls))
+        self.assertEqual(mock_parse.call_count, len(urls))
+        for r in resp:
+            self.assertIn(r['url'], urls)
+
+        mock_urls.assert_called_once()
+
+        mock_parse.stop()
+        mock_urls.stop()
 
     async def test__animals_urls(self):
         animals = ['http://schroniskowroclaw.pl/displaywp_project/burbon-22117/',
@@ -133,7 +143,11 @@ class TestSchroniskoWroclawPl(unittest.TestCase, metaclass=AsyncMeta):
                    'http://schroniskowroclaw.pl/displaywp_project/nelson-10117/']
         urls = []
 
-        with mock.patch.object(ClientSession, 'get', return_value=f_resp(all_animals)) as mock_get:
+        self.shelter.animal_url = fetch.SchroniskoWroclawPl.animal_url
+        self.shelter.next_url = fetch.SchroniskoWroclawPl.next_url
+        self.shelter.start_url = 'http://example.com'
+
+        with patch.object(ClientSession, 'get', return_value=f_resp(all_animals)) as mock_get:
             async with ClientSession() as session:
                 self.shelter.session = session
                 # TODO Pyflakes doesn't support async comprehension
@@ -149,7 +163,11 @@ class TestSchroniskoWroclawPl(unittest.TestCase, metaclass=AsyncMeta):
     async def test__animals_urls_invalid_html(self):
         urls = []
 
-        with mock.patch.object(ClientSession, 'get', return_value=f_resp('Invalid')) as mock_get:
+        self.shelter.animal_url = fetch.SchroniskoWroclawPl.animal_url
+        self.shelter.next_url = fetch.SchroniskoWroclawPl.next_url
+        self.shelter.start_url = 'http://example.com'
+
+        with patch.object(ClientSession, 'get', return_value=f_resp('Invalid')) as mock_get:
             async with ClientSession() as session:
                 self.shelter.session = session
                 # TODO Pyflakes doesn't support async comprehension
@@ -158,6 +176,23 @@ class TestSchroniskoWroclawPl(unittest.TestCase, metaclass=AsyncMeta):
 
             mock_get.assert_called_once_with(self.shelter.start_url)
             self.assertListEqual([], urls)
+
+
+class TestSchroniskoWroclawPl(unittest.TestCase, metaclass=AsyncMeta):
+
+    def setUp(self):
+        self.shelter = fetch.SchroniskoWroclawPl()
+
+    def test_class_attributes(self):
+        try:
+            XPath(self.shelter.animal_url)
+            XPath(self.shelter.next_url)
+        except XPathSyntaxError as e:
+            self.fail(e.msg)
+
+        url = urlparse(self.shelter.start_url)
+        self.assertIn(url.scheme, ('http', 'https'))
+        self.assertTrue(url.netloc)
 
     def test__parse(self):
         valid_data = {

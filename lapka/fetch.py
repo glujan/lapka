@@ -5,12 +5,17 @@ import aiohttp
 from lxml import etree
 
 
-class SchroniskoWroclawPl:
-    """Extract data about animals from schroniskowroclaw.pl website."""
+class Shelter:
+    """Base class for extracting data about from shelters websites."""
 
-    animal_url = "//div[@class='filter-item']//h5/a/@href"
-    next_url = "//ul[@class='page-numbers']//a[@class='next page-numbers']/@href"
-    start_url = 'http://schroniskowroclaw.pl/zwierzeta-do-adopcji/'
+    animal_url = ""
+    """"XPath expression to find URLs to animals profiles"""
+
+    next_url = ""
+    """XPath expression to find next website in pagination"""
+
+    start_url = ""
+    """URL to the beginning of animals list"""
 
     def __init__(self, session=None):
         """Initialize a new SchroniskoWroclawPl instance."""
@@ -51,6 +56,18 @@ class SchroniskoWroclawPl:
                 url = new_url if new_url != url else None
             except IndexError:
                 url = None
+
+    def _parse(self, content: str) -> dict:
+        """Extract data from animal's page."""
+        raise NotImplementedError
+
+
+class SchroniskoWroclawPl(Shelter):
+    """Extract data about animals from schroniskowroclaw.pl website."""
+
+    animal_url = "//div[@class='filter-item']//h5/a/@href"
+    next_url = "//ul[@class='page-numbers']//a[@class='next page-numbers']/@href"
+    start_url = "http://schroniskowroclaw.pl/zwierzeta-do-adopcji/"
 
     def _parse(self, content):
         try:
