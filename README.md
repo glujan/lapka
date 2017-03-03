@@ -1,5 +1,7 @@
 [![Build Status](https://travis-ci.org/glujan/lapka.svg?branch=master)](https://travis-ci.org/glujan/lapka)
-
+[![Coverage](https://codecov.io/gh/glujan/lapka/branch/master/graph/badge.svg)](https://codecov.io/gh/glujan/lapka)
+[![Aww cat](https://img.shields.io/badge/aww-cat-brightgreen.svg)](http://i.imgur.com/8dX8Qv2.mp4)
+[![Lol cat](https://img.shields.io/badge/lol-cat-brightgreen.svg)](http://i.imgur.com/WM0GVKQ.mp4)
 # Łapka
 
 Łapka (pronounce as _ˈwapka_, Polish for _a paw_) is an app to help browse and
