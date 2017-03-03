@@ -1,0 +1,9 @@
+sudo: false
+language: python
+cache: pip
+python:
+  - "3.6"
+install: pip install tox-travis codecov
+script: tox
+after_success: 
+  - codecov

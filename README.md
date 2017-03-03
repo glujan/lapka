@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/glujan/lapka.svg?branch=master)](https://travis-ci.org/glujan/lapka)
+
 # Łapka
 
 Łapka (pronounce as _ˈwapka_, Polish for _a paw_) is an app to help browse and
