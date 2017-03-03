@@ -2,6 +2,7 @@
 import asyncio
 
 import aiohttp
+
 from lxml import etree
 
 
@@ -91,15 +92,14 @@ class SchroniskoWroclawPl(Shelter):
         return data
 
 
-async def _main():
-    async with aiohttp.ClientSession() as session:
-        shelter = SchroniskoWroclawPl()
-        animals = await shelter.parse(session)
-
-    print('Gathered {} animals'.format(len(animals)))
-
-
 if __name__ == '__main__':
+    async def _main():
+        async with aiohttp.ClientSession() as session:
+            shelter = SchroniskoWroclawPl()
+            animals = await shelter.parse(session)
+
+        print('Gathered {} animals'.format(len(animals)))
+
     loop = asyncio.get_event_loop()
     loop.run_until_complete(_main())
     loop.close()

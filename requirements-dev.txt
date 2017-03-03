@@ -1,4 +1,4 @@
 bpython
 pudb
-pycodestyle
-pydocstyle
+tox
+-r requirements-tox.txt
