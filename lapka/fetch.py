@@ -1,5 +1,7 @@
 """Fetch and parse data from shelters' websites to a common format."""
 import asyncio
+from functools import partial
+from urllib.parse import urljoin, urlparse
 
 import aiohttp
 
@@ -21,6 +23,11 @@ class Shelter:
     def __init__(self, session=None):
         """Initialize a new SchroniskoWroclawPl instance."""
         self.session = session
+        self._full_url = partial(
+            urljoin,
+            '{url.scheme}://{url.netloc}/'.format(url=urlparse(self.start_url))
+        )
+        """Transform partial URL to a full one. Use with instance of this class."""
 
     async def parse(self, session=None):
         """Crawl shelter's website and return data in an unified format."""
@@ -53,7 +60,7 @@ class Shelter:
                 yield a_url
 
             try:
-                new_url = doc.xpath(self.next_url)[0]
+                new_url = self._full_url(doc.xpath(self.next_url)[0])
                 url = new_url if new_url != url else None
             except IndexError:
                 url = None
@@ -76,13 +83,14 @@ class SchroniskoWroclawPl(Shelter):
             name = doc.xpath("//div[@class='project-details']//h1/text()")[0].split(' ')[0]
             a_id, since, *other = doc.xpath("//*[@class='project-info']//span/text()")
             category = other[0] if other else None  # FIXME Normalize categories
+            photos = map(self._full_url, doc.xpath("//div[@class='project-slider']//img/@src"))
 
             data = {
-                'name': name,
+                'name': name.strip().title(),
                 'id': a_id,
                 'since': since,
                 'category': category,
-                'photos': doc.xpath("//div[@class='project-slider']//img/@src"),
+                'photos': list(photos),
                 'description': doc.xpath("//div[@class='project-details']/p/text()"),
             }
         except (IndexError, etree.XMLSyntaxError):

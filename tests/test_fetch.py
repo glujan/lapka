@@ -1,7 +1,7 @@
 import unittest
 from pathlib import Path
 from unittest.mock import patch
-from urllib.parse import urlparse
+from urllib.parse import urljoin, urlparse
 
 from aiohttp import ClientSession
 from lxml.etree import XPath, XPathSyntaxError
@@ -108,6 +108,14 @@ class TestSchroniskoWroclawPl(unittest.TestCase, metaclass=AsyncMeta):
         url = urlparse(self.shelter.start_url)
         self.assertIn(url.scheme, ('http', 'https'))
         self.assertTrue(url.netloc)
+
+    def test__full_url(self):
+        for url in ("/partial-url", "other-relative", "/another?p=1", "http://example.org/remote"):
+            with self.subTest(url=url):
+                full = self.shelter._full_url(url)
+                base = '{url.scheme}://{url.netloc}/'.format(url=urlparse(self.shelter.start_url))
+                valid_full = urljoin(base, url)
+                self.assertEqual(valid_full, full)
 
     def test__parse(self):
         valid_data = {
