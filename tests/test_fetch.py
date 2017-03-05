@@ -46,6 +46,23 @@ class TestShelter(unittest.TestCase, metaclass=AsyncMeta):
         mock_parse.stop()
         mock_urls.stop()
 
+    async def test_parse_not_overwrite_session(self):
+        async def dummy_urls(*args):
+            for u in []:
+                yield u
+
+        mock_parse = patch.object(self.shelter, '_parse', return_value={}).start()
+        mock_urls = patch.object(self.shelter, '_animals_urls', side_effect=dummy_urls).start()
+
+        with patch.object(ClientSession, 'get', return_value=f_resp(self.animals_list)):
+            async with ClientSession() as session:
+                self.shelter.session = session
+                await self.shelter.parse(None)
+                self.assertIs(self.shelter.session, session)
+
+        mock_parse.stop()
+        mock_urls.stop()
+
     async def test__animals_urls(self):
         animals = ['http://schroniskowroclaw.pl/displaywp_project/burbon-22117/',
                    'http://schroniskowroclaw.pl/displaywp_project/nelson-10117/',
