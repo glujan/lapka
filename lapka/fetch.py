@@ -57,7 +57,7 @@ class Shelter:
 
             doc = etree.HTML(content)
             for a_url in doc.xpath(self.animal_url):
-                yield a_url
+                yield self._full_url(a_url)
 
             try:
                 new_url = self._full_url(doc.xpath(self.next_url)[0])

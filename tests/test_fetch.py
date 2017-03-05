@@ -13,9 +13,11 @@ from lapka import fetch
 class TestShelter(unittest.TestCase, metaclass=AsyncMeta):
     @classmethod
     def setUpClass(cls):
-        fp = Path(__file__).parent / 'assets' / 'animals_list_01.html'
-        with open(fp, 'r') as f:
-            cls.animals_list = f.read()
+        cls.animals_list = """
+            <a class='animal' href="/animal01">Animal 01</a>
+            <a class="animal" href="http://example.com/animal02">Animal 02</a>
+            <a class="next" href="http://example.com/?p=2">Next</a>
+        """
 
     def setUp(self):
         self.shelter = fetch.Shelter()
@@ -64,15 +66,18 @@ class TestShelter(unittest.TestCase, metaclass=AsyncMeta):
         mock_urls.stop()
 
     async def test__animals_urls(self):
-        animals = ['http://schroniskowroclaw.pl/displaywp_project/burbon-22117/',
-                   'http://schroniskowroclaw.pl/displaywp_project/nelson-10117/',
-                   'http://schroniskowroclaw.pl/displaywp_project/burbon-22117/',
-                   'http://schroniskowroclaw.pl/displaywp_project/nelson-10117/']
-        urls = []
+        animals = ['http://example.com/animal01',
+                   'http://example.com/animal02'] * 2
 
-        self.shelter.animal_url = fetch.SchroniskoWroclawPl.animal_url
-        self.shelter.next_url = fetch.SchroniskoWroclawPl.next_url
-        self.shelter.start_url = 'http://example.com'
+        urls = []
+        base = 'http://example.com'
+
+        orig_start_url = fetch.Shelter.start_url
+        fetch.Shelter.start_url = base
+        self.shelter = fetch.Shelter()
+        self.shelter.animal_url = "//a[@class='animal']/@href"
+        self.shelter.next_url = "//a[@class='next']/@href"
+        self.assertEqual(self.shelter.start_url, base)
 
         with patch.object(ClientSession, 'get', return_value=f_resp(self.animals_list)) as mock_get:
             async with ClientSession() as session:
@@ -85,13 +90,15 @@ class TestShelter(unittest.TestCase, metaclass=AsyncMeta):
             self.assertEqual(mock_get.call_count, 2)
 
             mock_get.assert_any_call(self.shelter.start_url)
-            mock_get.assert_any_call('http://schroniskowroclaw.pl/zwierzeta-do-adopcji/?page=2')
+            mock_get.assert_any_call("http://example.com/?p=2")
+
+        fetch.Shelter.start_url = orig_start_url
 
     async def test__animals_urls_invalid_html(self):
         urls = []
 
-        self.shelter.animal_url = fetch.SchroniskoWroclawPl.animal_url
-        self.shelter.next_url = fetch.SchroniskoWroclawPl.next_url
+        self.shelter.animal_url = "//a[@class='animal']/@href"
+        self.shelter.next_url = "//a[@class='next']/@href"
         self.shelter.start_url = 'http://example.com'
 
         with patch.object(ClientSession, 'get', return_value=f_resp('Invalid')) as mock_get:
@@ -111,6 +118,10 @@ class TestSchroniskoWroclawPl(unittest.TestCase, metaclass=AsyncMeta):
         fp = Path(__file__).parent / 'assets' / 'animal_01.html'
         with open(fp, 'r') as f:
             cls.animal = f.read()
+
+        fp = Path(__file__).parent / 'assets' / 'animals_list_01.html'
+        with open(fp, 'r') as f:
+            cls.animals_list = f.read()
 
     def setUp(self):
         self.shelter = fetch.SchroniskoWroclawPl()
@@ -151,3 +162,21 @@ class TestSchroniskoWroclawPl(unittest.TestCase, metaclass=AsyncMeta):
     def test__parse_invalid_html(self):
         data = self.shelter._parse('')
         self.assertDictEqual(data, {})
+
+    async def test__animals_urls(self):
+        animals = ['http://schroniskowroclaw.pl/displaywp_project/burbon-22117/',
+                   'http://schroniskowroclaw.pl/displaywp_project/nelson-10117/'] * 2
+        urls = []
+
+        with patch.object(ClientSession, 'get', return_value=f_resp(self.animals_list)) as mock_get:
+            async with ClientSession() as session:
+                self.shelter.session = session
+                # TODO Pyflakes doesn't support async comprehension
+                async for url in self.shelter._animals_urls():
+                    urls.append(url)
+
+            self.assertListEqual(urls, animals)
+            self.assertEqual(mock_get.call_count, 2)
+
+            mock_get.assert_any_call(self.shelter.start_url)
+            mock_get.assert_any_call('http://schroniskowroclaw.pl/zwierzeta-do-adopcji/?page=2')
