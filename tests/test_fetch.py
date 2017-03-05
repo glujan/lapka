@@ -180,3 +180,68 @@ class TestSchroniskoWroclawPl(unittest.TestCase, metaclass=AsyncMeta):
 
             mock_get.assert_any_call(self.shelter.start_url)
             mock_get.assert_any_call('http://schroniskowroclaw.pl/zwierzeta-do-adopcji/?page=2')
+
+
+class TestNaPaluchuWawPl(unittest.TestCase, metaclass=AsyncMeta):
+    @classmethod
+    def setUpClass(cls):
+        fp = Path(__file__).parent / 'assets' / 'animal_11.html'
+        with open(fp, 'r') as f:
+            cls.animal = f.read()
+
+        fp = Path(__file__).parent / 'assets' / 'animals_list_11.html'
+        with open(fp, 'r') as f:
+            cls.animals_list = f.read()
+
+    def setUp(self):
+        self.shelter = fetch.NaPaluchuWawPl()
+
+    def test_class_attributes(self):
+        try:
+            XPath(self.shelter.animal_url)
+            XPath(self.shelter.next_url)
+        except XPathSyntaxError as e:
+            self.fail(e.msg)
+
+        url = urlparse(self.shelter.start_url)
+        self.assertIn(url.scheme, ('http', 'https'))
+        self.assertTrue(url.netloc)
+
+    def test__parse(self):
+        valid_data = {
+            'name': 'Rambo',
+            'id': '1833/16',
+            'photos': [
+                'http://www.napaluchu.waw.pl/files/animals_napaluchu/big/170117065222.jpg',
+                'http://www.napaluchu.waw.pl/files/animals_napaluchu/big/170117065223.jpg'],
+            'since': '02.10.2016',
+            'category': 'Pies',  # TODO i18n
+            'description': ['Rambo to wyjątkowy pies dla wyjątkowego opiekuna.',
+                            'Ma zaledwie rok, wciąż rośnie, poznaje świat, wszystko go interesuje.',
+                            'Ze względu na domieszkę krwi charta angielskiego potrzebuje bardzo dużo ruchu.',
+                            'Skąd: Warszawa,  ul.Bokserska'],
+        }
+        data = self.shelter._parse(self.animal)
+        self.assertDictEqual(data, valid_data)
+
+    def test__parse_invalid_html(self):
+        data = self.shelter._parse('')
+        self.assertDictEqual(data, {})
+
+    async def test__animals_urls(self):
+        animals = ['http://www.napaluchu.waw.pl/czekam_na_ciebie/wszystkie_zwierzeta_do_adopcji/011100429',
+                   'http://www.napaluchu.waw.pl/czekam_na_ciebie/wszystkie_zwierzeta_do_adopcji/000801535'] * 2
+        urls = []
+
+        with patch.object(ClientSession, 'get', return_value=f_resp(self.animals_list)) as mock_get:
+            async with ClientSession() as session:
+                self.shelter.session = session
+                # TODO Pyflakes doesn't support async comprehension
+                async for url in self.shelter._animals_urls():
+                    urls.append(url)
+
+            self.assertListEqual(urls, animals)
+            self.assertEqual(mock_get.call_count, 2)
+
+            mock_get.assert_any_call(self.shelter.start_url)
+            mock_get.assert_any_call('http://www.napaluchu.waw.pl/czekam_na_ciebie/wszystkie_zwierzeta_do_adopcji:2')

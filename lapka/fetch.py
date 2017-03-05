@@ -100,6 +100,38 @@ class SchroniskoWroclawPl(Shelter):
         return data
 
 
+class NaPaluchuWawPl(Shelter):
+    """Extract data about animals from schroniskowroclaw.pl website."""
+
+    animal_url = "//div[@id='ani_search_result_cont']//a[@class='animals_btn_list_more']/@href"
+    next_url = "//div[@class='pagination']/a[@class='next']/@href"
+    start_url = "http://www.napaluchu.waw.pl/czekam_na_ciebie/wszystkie_zwierzeta_do_adopcji"
+
+    def _parse(self, content):
+        try:
+            doc = etree.HTML(content).xpath("//div[@class='ani_one_container']")[0]
+            name = doc.xpath("//h5/text()")[0]
+            category, *_, since, a_id = doc.xpath("//div[@class='info']//span[not(@class)]/text()")
+            photos = map(self._full_url, doc.xpath("//div[@id='main_image_cont']//a/@href"))
+
+            raw_desc = doc.xpath("//div[@class='description']//text()")
+            desc = filter(bool, map(lambda s: s.strip(), raw_desc))
+
+            data = {
+                'name': name.strip().title(),
+                'id': a_id.split(': ')[-1],
+                'since': since.strip().split(': ')[-1],
+                'category': category.strip().split(': ')[-1],  # TODO Normalize
+                'photos': list(photos),
+                'description': list(desc),
+            }
+        except (IndexError, etree.XMLSyntaxError):
+            # TODO Add logging that couldn't parse website
+            data = {}
+
+        return data
+
+
 if __name__ == '__main__':
     async def _main():
         async with aiohttp.ClientSession() as session:
