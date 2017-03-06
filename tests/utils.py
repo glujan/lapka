@@ -59,9 +59,13 @@ class AsyncMeta(type):
 
         if hasattr(result, 'setUp'):
             setattr(result, 'setUp', _init_loop(result.setUp))
+        else:
+            setattr(result, 'setUp', _init_loop(lambda self: None))
 
         if hasattr(result, 'tearDown'):
-            setattr(result, 'tearDown', _init_loop(result.tearDown))
+            setattr(result, 'tearDown', _close_loop(result.tearDown))
+        else:
+            setattr(result, 'tearDown', _close_loop(lambda self: None))
 
         return result
 
