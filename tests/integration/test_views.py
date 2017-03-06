@@ -3,13 +3,13 @@ from http import HTTPStatus
 
 from aiohttp.test_utils import AioHTTPTestCase, unittest_run_loop
 
-from lapka import views
+from lapka import get_app
 
 
 class TestViews(AioHTTPTestCase):
 
     async def get_application(self, loop):
-        return views.get_app(loop=loop)
+        return get_app(loop=loop)
 
     @unittest_run_loop
     async def test_animal_profile(self):
