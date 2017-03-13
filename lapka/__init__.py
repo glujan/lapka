@@ -18,5 +18,7 @@ def get_app(loop=None, **kwargs):
 
     app = web.Application(loop=loop, middlewares=middlewares, **kwargs)
     app.router.add_route('GET', r'/animal/{id:[\w-]+}/', views._animal_profile)
+    app.router.add_route('GET', r'/animal/matching/{user:[\w-]+}/', views._matching)
+    app.router.add_route('POST', r'/animal/skip/{user:[\w-]+}/', views._skip)
 
     return app

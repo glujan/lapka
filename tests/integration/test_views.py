@@ -9,6 +9,10 @@ from lapka.models import Animal
 
 class TestViews(AioHTTPTestCase):
 
+    @classmethod
+    def setUpClass(cls):
+        cls.json_content = 'application/json'
+
     async def get_application(self, loop):
         return get_app(loop=loop)
 
@@ -31,6 +35,7 @@ class TestViews(AioHTTPTestCase):
         animal.save()
         req = await self.client.request('GET', '/animal/{}/'.format(animal_id))
         self.assertEqual(req.status, HTTPStatus.OK)
+        self.assertEqual(req.content_type, self.json_content)
         resp = await req.text()
         self.assertDictEqual(json.loads(resp), animal.to_dict())
         animal.remove()
@@ -41,3 +46,19 @@ class TestViews(AioHTTPTestCase):
         self.assertEqual(req.status, HTTPStatus.NOT_FOUND)
         resp = await req.text()
         self.assertDictEqual(json.loads(resp), {})
+
+    @unittest_run_loop
+    async def test_skip(self):
+        req = await self.client.get('/animal/skip/some-id/')
+        self.assertEqual(req.status, HTTPStatus.METHOD_NOT_ALLOWED)
+
+        req = await self.client.post('/animal/skip/some-id/')
+        self.assertEqual(req.status, HTTPStatus.OK)
+        self.assertEqual(req.content_type, self.json_content)
+        self.assertDictEqual(json.loads(await req.text()), {})
+
+    @unittest_run_loop
+    async def test_matching(self):
+        req = await self.client.get('/animal/matching/user-id/')
+        self.assertEqual(req.status, HTTPStatus.OK)
+        self.assertEqual(req.content_type, self.json_content)
