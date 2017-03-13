@@ -2,6 +2,8 @@
 
 import asyncio
 
+from pathlib import Path
+
 from aiohttp import web
 
 from lapka import views
@@ -20,5 +22,6 @@ def get_app(loop=None, **kwargs):
     app.router.add_route('GET', r'/animal/{id:[\w-]+}/', views._animal_profile)
     app.router.add_route('GET', r'/animal/matching/{user:[\w-]+}/', views._matching)
     app.router.add_route('POST', r'/animal/skip/{user:[\w-]+}/', views._skip)
+    app.router.add_static('/ui', Path('./ui'))
 
     return app

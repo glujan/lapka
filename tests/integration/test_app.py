@@ -33,3 +33,9 @@ class TestApp(AioHTTPTestCase):
             req = await self.client.get(url, allow_redirects=False)
             self.assertEqual(req.status, HTTPStatus.MOVED_PERMANENTLY)
             self.assertEqual(mock_find.call_count, 0)
+
+    @unittest_run_loop
+    async def test_ui(self):
+        url = '/ui/index.html'
+        req = await self.client.get(url)
+        self.assertEqual(req.status, HTTPStatus.OK)
