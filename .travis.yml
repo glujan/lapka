@@ -3,7 +3,18 @@ language: python
 cache: pip
 python:
   - "3.6"
+env:
+    - NODE_VERSION="lts/boron"
+before_install:
+    - wget https://raw.githubusercontent.com/creationix/nvm/v0.33.1/nvm.sh -O ~/.nvm/nvm.sh
+    - source ~/.nvm/nvm.sh
+    - nvm install $NODE_VERSION
+    - nvm use $NODE_VERSION
+    - cd ui && npm install && npm run build && cd ..
 install: pip install tox-travis codecov
-script: tox
+script: 
+    - tox
+    - cd ui && npm run test
+    - cd ..
 after_success: 
   - codecov

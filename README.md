@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/glujan/lapka.svg?branch=master)](https://travis-ci.org/glujan/lapka)
-[![Coverage](https://codecov.io/gh/glujan/lapka/branch/master/graph/badge.svg)](https://codecov.io/gh/glujan/lapka)
+[![Coveraget ](https://codecov.io/gh/glujan/lapka/branch/master/graph/badge.svg)](https://codecov.io/gh/glujan/lapka)
 [![Aww cat](https://img.shields.io/badge/aww-cat-brightgreen.svg)](http://i.imgur.com/8dX8Qv2.mp4)
 [![Lol cat](https://img.shields.io/badge/lol-cat-brightgreen.svg)](http://i.imgur.com/WM0GVKQ.mp4)
 # Łapka
@@ -28,3 +28,17 @@ pip install -r requirements-dev.txt -r requirements.txt
 
 Tests, coverage and linter are run using _Tox_. Just type `tox` from the
 project root directory and enjoy results.
+
+Similary, I'm using [nvm](https://github.com/creationix/nvm) to manage
+_Node.js_ versions. This is how to run JS tests:
+
+```bash
+curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.1/install.sh | bash
+NODE_VER=lts/boron
+nvm install $NODE_VER
+echo $NODE_VER > .nvmrc
+nvm use
+cd ui/
+npm install  # setup of nvm and Node ends here
+npm test     # run this inside ui/js directory
+```
