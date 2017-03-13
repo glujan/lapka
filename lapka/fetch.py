@@ -134,14 +134,14 @@ class NaPaluchuWawPl(Shelter):
 
 if __name__ == '__main__':
     async def _main():
+        import pickle
+        from itertools import chain
+        from lapka import models
+
         async with aiohttp.ClientSession() as session:
             tasks = (sh.parse(session) for sh in (SchroniskoWroclawPl(),
                                                   NaPaluchuWawPl()))
             fetched = await asyncio.gather(*tasks)
-
-        import pickle
-        from itertools import chain
-        from lapka import models
 
         animals = [models.Animal(**data) for data in chain(*fetched)]
         print('Gathered', len(animals), 'animals')
