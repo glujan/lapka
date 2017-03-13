@@ -53,6 +53,16 @@
     <custom-footer></custom-footer>
   </div>
 
+  <div id="animal-app" class="container">
+    <custom-header></custom-header>
+    <div class="row">
+      <div class="twelve columns">
+          <animal-profile></animal-profile>
+      </div>
+    </div>
+    <custom-footer></custom-footer>
+  </div>
+
   <script id="profile-settings-tmpl" type="text/x-template">
     <div>
         <social-connect></social-connect>
@@ -105,9 +115,14 @@
 
   <script id="animal-profile-tmpl" type="text/x-template">
     <div>
-      <h5>{{ name }}</h5>
-      <p>{{ name }} is {{ age}} years old and can be adopted in {{ place }}.</p>
-      <p>{{ description }}</p>
+      <h4>{{ animal.name }}</h4>
+      <img v-if="animal.photos.length > 0" :src="animal.photos[0]"/>
+      <p>{{ animal.name }} is here since {{ animal.since }} and can be adopted in {{ animal.place }}.</p>
+      <p v-for="(par, index) in animal.description">{{ par }}</p>
+      <ul @mouseover.stop="fetchNext()">
+        <li><a href="#like" @click.prevent="like(animal.id)">Like</a></li>
+        <li><a href="#skip" @click.prevent="seeNext(animal.id)">Skip</a></li>
+      </ul>
     </div>
   </script>
 
