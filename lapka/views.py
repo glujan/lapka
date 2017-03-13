@@ -4,24 +4,18 @@ from http import HTTPStatus
 
 from aiohttp import web
 
+from lapka.models import Animal
+
 
 async def find_animal(a_id: str) -> dict:
     """Find animal with given id and return serialized data."""
     # TODO Use a storage instead of constants
 
-    if a_id.endswith('INVALID'):
+    try:
+        animal = Animal.find(a_id)[0]
+        data = animal.to_dict()
+    except IndexError:
         data = {}
-    else:
-        data = {
-            'id': a_id,
-            'name': 'Name',
-            'age': 5,
-            'place': 'Wrocław',
-            'description': [
-                'First paragraph',
-                'Second paragraph',
-            ],
-        }
 
     return data
 
