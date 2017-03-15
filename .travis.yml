@@ -5,7 +5,7 @@ cache:
     directories:
       - ui/node_modules
 python:
-  - "3.6"
+    - "3.6"
 env:
     - NODE_VERSION="lts/boron"
 before_install:
@@ -13,11 +13,10 @@ before_install:
     - source ~/.nvm/nvm.sh
     - nvm install $NODE_VERSION
     - nvm use $NODE_VERSION
-    - cd ui && npm install --quiet && npm run build && cd ..
+    - (cd ui && npm install --quiet && npm run build)
 install: pip install tox-travis codecov
 script: 
     - tox
-    - cd ui && npm run test
-    - cd ..
+    - (cd ui && npm run test)
 after_success: 
-  - codecov
+    - codecov
