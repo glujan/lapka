@@ -1,9 +1,9 @@
 <template>
   <div id="app" class="container">
-    <status-header class="row" userId="userid"></status-header>
+    <status-header class="row" :userId="userId"></status-header>
     <img src="./assets/logo.png">
     <div class="row">
-      <router-view userId="userid"></router-view>
+      <router-view :userId="userId"></router-view>
     </div>
     <footer class="row">
       <div class="six columns">
@@ -23,6 +23,9 @@ export default {
   name: 'app',
   components: {
     'status-header': StatusHeader
+  },
+  data: () => {
+    return {userId: 'user-id'}  // TODO Use real user id
   }
 }
 </script>

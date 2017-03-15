@@ -12,8 +12,6 @@
 </template>
 
 <script>
-var userId = 'userid'  // TODO User real id
-
 function httpError (url) {
   return function (error) {
     console.warn('Could not fetch data from', url, ':', error)
@@ -40,6 +38,9 @@ export default {
       // lru: {}
     }
   },
+  props: {
+    userId: {type: String, required: true}
+  },
   methods: {
     _get: function (url, success) {
       var queryUrl = url + '/'
@@ -49,7 +50,7 @@ export default {
     },
     _fetchMatching: function (success) {
       var $this = this
-      var url = 'animal/matching/' + userId
+      var url = 'animal/matching/' + this.userId
       this._get(url, function (resp) {
         $this.matching = resp.data
         if (typeof success === 'function') {
@@ -58,7 +59,7 @@ export default {
       })
     },
     like: function (uid) {
-      axios.post('animal/' + uid + '/like/' + userId + '/')
+      axios.post('animal/' + uid + '/like/' + this.userId + '/')
       console.info('Liked ' + uid)  // TODO Implement notyfing user
       this.seeNext(uid)
     },
@@ -70,7 +71,7 @@ export default {
       }
 
       if (currUid) {
-        axios.post('animal/' + currUid + '/skip/' + userId + '/')
+        axios.post('animal/' + currUid + '/skip/' + this.userId + '/')
       }
 
       if (this.next === null) {

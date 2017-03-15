@@ -9,6 +9,7 @@ describe('AnimalProfile.vue', () => {
   var animal, next, matching, vm
   var resp200 = {status: 200, responseText: 'ok'}
   const Constructor = Vue.extend(AnimalProfile)
+  const userId = 'userid'
 
   beforeAll(() => {
     moxios.install()
@@ -26,7 +27,8 @@ describe('AnimalProfile.vue', () => {
     vm = new Constructor({
       data: () => {
         return {animal: animal, next: next, matching: matching}
-      }
+      },
+      propsData: {userId: userId}
     })
   })
 
@@ -98,7 +100,8 @@ describe('AnimalProfile.vue', () => {
       let vm = new Constructor({
         data: () => {
           return {next: next, animal: animal, matching: matching}
-        }
+        },
+        propsData: {userId: userId}
       })
 
       Vue.nextTick(() => {
@@ -124,7 +127,8 @@ describe('AnimalProfile.vue', () => {
       let vm = new Constructor({
         data: () => {
           return {next: next, animal: animal, matching: matching}
-        }
+        },
+        propsData: {userId: userId}
       })
       spyOn(matching, 'shift').and.callThrough()
       spyOn(axios, 'get').and.callThrough()
@@ -146,7 +150,8 @@ describe('AnimalProfile.vue', () => {
       let vm = new Constructor({
         data: () => {
           return {next: next, animal: animal, matching: matching}
-        }
+        },
+        propsData: {userId: userId}
       })
       spyOn(matching, 'shift').and.callThrough()
       spyOn(axios, 'get').and.callThrough()
@@ -218,7 +223,8 @@ describe('AnimalProfile.vue', () => {
       let vm = new Constructor({
         data: () => {
           return {next: next, animal: {}, matching: matching}
-        }
+        },
+        propsData: {userId: userId}
       })
 
       spyOn(vm, 'fetchNext').and.callThrough()
@@ -241,7 +247,8 @@ describe('AnimalProfile.vue', () => {
       let vm = new Constructor({
         data: () => {
           return {next: next, animal: {}, matching: matching}
-        }
+        },
+        propsData: {userId: userId}
       })
 
       spyOn(axios, 'get').and.callThrough()
