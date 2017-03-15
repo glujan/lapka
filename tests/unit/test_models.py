@@ -23,21 +23,21 @@ class TestAnimal(unittest.TestCase):
 
     def test_save(self):
         result = Animal.find(self.animal.a_id)
-        self.assertListEqual(result, [])
+        self.assertEqual(result, None)
 
         self.animal.save()
         result = Animal.find(self.animal.a_id)
-        self.assertListEqual(result, [self.animal, ])
+        self.assertEqual(result, self.animal)
 
     def test_remove(self):
         self.animal.save()
 
         result = Animal.find(self.animal.a_id)
-        self.assertListEqual(result, [self.animal, ])
+        self.assertEqual(result, self.animal)
 
         self.animal.remove()
         result = Animal.find(self.animal.a_id)
-        self.assertListEqual(result, [])
+        self.assertEqual(result, None)
 
     def test_to_dict(self):
         data = self.animal.to_dict()

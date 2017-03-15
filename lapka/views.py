@@ -10,9 +10,9 @@ from lapka.models import Animal
 async def find_animal(a_id: str) -> dict:
     """Find animal with given id and return serialized data."""
     try:
-        animal = Animal.find(a_id)[0]
+        animal = Animal.find(a_id)
         data = animal.to_dict()
-    except IndexError:
+    except AttributeError:
         data = {}
 
     return data

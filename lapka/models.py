@@ -65,5 +65,8 @@ class Animal:
         if not cls._data:
             cls._data = _load()
 
-        animals = list(filter(lambda a: a.a_id == animal_id, cls._data))
-        return animals
+        try:
+            animal = next(filter(lambda a: a.a_id == animal_id, cls._data))
+        except StopIteration:
+            animal = None
+        return animal
