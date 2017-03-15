@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="twelve columns">
         <h4>{{ animal.name }}</h4>
         <img v-if="animal.photos.length > 0" :src="animal.photos[0]"/>
         <p>{{ animal.name }} is here since {{ animal.since }} and can be adopted in {{ animal.place }}.</p>
