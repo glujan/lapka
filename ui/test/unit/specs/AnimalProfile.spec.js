@@ -49,6 +49,20 @@ describe('AnimalProfile.vue', () => {
     })
   })
 
+  it('should send a like, notify a user and switch to next animal', () => {
+    spyOn(vm, 'seeNext')
+    spyOn(axios, 'post')
+    spyOn(console, 'info')
+
+    vm.like('animal-id')
+    vm.userId = 'user-id'
+    expect(vm.seeNext).toHaveBeenCalledTimes(1)
+    expect(vm.seeNext).toHaveBeenCalledWith('animal-id')
+    expect(console.info).toHaveBeenCalledTimes(1)
+    expect(axios.post).toHaveBeenCalledTimes(1)
+    expect(axios.post).toHaveBeenCalledWith('animal/animal-id/like/userid/')
+  })
+
   it('should render correct name', done => {
     spyOn(vm, '_fetchMatching')
 
@@ -262,18 +276,5 @@ describe('AnimalProfile.vue', () => {
         })
       })
     })
-  })
-
-  it('should send a like, notify a user and switch to next animal', () => {
-    spyOn(vm, 'seeNext')
-    spyOn(axios, 'post')
-    spyOn(console, 'info')
-
-    vm.like('animal-id')
-    expect(vm.seeNext).toHaveBeenCalledTimes(1)
-    expect(vm.seeNext).toHaveBeenCalledWith('animal-id')
-    expect(console.info).toHaveBeenCalledTimes(1)
-    expect(axios.post).toHaveBeenCalledTimes(1)
-    expect(axios.post).toHaveBeenCalledWith('animal/animal-id/like/userid/')
   })
 })
