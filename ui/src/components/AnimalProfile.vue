@@ -12,8 +12,7 @@
 </template>
 
 <script>
-var userId = 'userid'
-var baseUrl = 'http://127.0.0.1:8080/'
+var userId = 'userid'  // TODO User real id
 
 function httpError (url) {
   return function (error) {
@@ -25,7 +24,7 @@ var animalData = {
   name: '',
   age: 0,
   place: '',
-  description: '',
+  description: [],
   photos: []
 }
 
@@ -43,7 +42,7 @@ export default {
   },
   methods: {
     _get: function (url, success) {
-      var queryUrl = baseUrl + url + '/'
+      var queryUrl = url + '/'
       axios.get(queryUrl)
         .then(success)
         .catch(httpError(queryUrl))
@@ -58,8 +57,10 @@ export default {
         }
       })
     },
-    like: function (uid, e) {  // TODO Implement
-      window.alert('Liked ' + uid)
+    like: function (uid) {
+      axios.post('animal/' + uid + '/like/' + userId + '/')
+      console.info('Liked ' + uid)  // TODO Implement notyfing user
+      this.seeNext(uid)
     },
     seeNext: function (currUid) {
       var $this = this
@@ -69,7 +70,7 @@ export default {
       }
 
       if (currUid) {
-        axios.post(baseUrl + 'animal/skip/' + userId + '/')
+        axios.post('animal/' + currUid + '/skip/' + userId + '/')
       }
 
       if (this.next === null) {
@@ -98,8 +99,8 @@ export default {
     }
   },
   mounted: function () {
-    var $this = this
-    this._fetchMatching(function () {
+    let $this = this
+    this._fetchMatching(() => {
       $this.seeNext()
     })
   }
