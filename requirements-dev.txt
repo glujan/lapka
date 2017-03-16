@@ -1,4 +1,4 @@
 bpython
 pudb
 tox
--r requirements-tox.txt
+-r requirements.txt

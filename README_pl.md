@@ -17,12 +17,17 @@ pyenv install 3.6.0
 pyenv virtualenv $ENV_NAME $PY36       # tworzy virtualenva dla projektu
 pyenv local $PY36/env/$ENV_NAME $PY36  # ustawia obie wersje jako lokalne,
                                        # pierwsza dla ciebie, druga dla toxa
-pip install -r requirements-dev.txt -r requirements.txt
+pip install -r requirements-dev.txt -c constraints.txt
 ```
 
-Testy, pokrycie testami i linter są odpalane z użyciem narzędzia _Tox_. Po
-prostu wpisz komendę `tox` będąc w katalogu głównym projektu i podziwiaj
-wyniki.
+Testy, pokrycie testami, linter i inne skrypty są odpalane z użyciem narzędzia
+_Tox_. Uruchom wszystkie testy wpisując po prostu komendę `tox` lub wybierz
+interesujący cię skrpyt (poprzez `tox -e NAZWA`):
+
+ * `py36` - uruchom testy jednostkowe i integracyjne, zmierz pokrycie testami,
+ * `style` - sprawdź styl kodu i jego dokumentacji oraz złożoność cyklomatyczną,
+ * `upgrade` - sprawdź czy można bezpiecznie zaktualizować zależności. Zależne
+   od powodzenia testów jednostkowych i integracyjnych!
 
 Analogiczne korzystam z [nvm](https://github.com/creationix/nvm) do zarządzania
 wersjami _Node.js_. Oto jak uruchomić testy dla JS:

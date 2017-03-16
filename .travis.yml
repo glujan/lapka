@@ -16,7 +16,7 @@ before_install:
     - (cd ui && npm install --quiet && npm run build)
 install: pip install tox-travis codecov
 script: 
-    - tox
+    - tox -e py36
     - (cd ui && npm run test)
 after_success: 
     - codecov

@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/glujan/lapka.svg?branch=master)](https://travis-ci.org/glujan/lapka)
-[![Coveraget ](https://codecov.io/gh/glujan/lapka/branch/master/graph/badge.svg)](https://codecov.io/gh/glujan/lapka)
+[![Coverage](https://codecov.io/gh/glujan/lapka/branch/master/graph/badge.svg)](https://codecov.io/gh/glujan/lapka)
 [![Aww cat](https://img.shields.io/badge/aww-cat-brightgreen.svg)](http://i.imgur.com/8dX8Qv2.mp4)
 [![Lol cat](https://img.shields.io/badge/lol-cat-brightgreen.svg)](http://i.imgur.com/WM0GVKQ.mp4)
 # Łapka
@@ -23,11 +23,16 @@ pyenv install 3.6.0
 pyenv virtualenv $ENV_NAME $PY36       # create a virtualenv for development
 pyenv local $PY36/env/$ENV_NAME $PY36  # set both versions as your local Python
                                        # 1st for development, 2nd for Tox
-pip install -r requirements-dev.txt -r requirements.txt
+pip install -r requirements-dev.txt -c constraints.txt
 ```
 
-Tests, coverage and linter are run using _Tox_. Just type `tox` from the
-project root directory and enjoy results.
+Tests, coverage, linter and other are run using _Tox_. Run all environments by
+typing `tox` or choose a specific one (with `tox -e NAME`):
+
+ * `py36` - run unit and integration tests, measure coverage,
+ * `style` - check code and docs style, cyclomatic complexity,
+ * `upgrade` - test if dependencies can be safely upgraded. Depends on test
+   unit and integration tests success!
 
 Similary, I'm using [nvm](https://github.com/creationix/nvm) to manage
 _Node.js_ versions. This is how to run JS tests:
