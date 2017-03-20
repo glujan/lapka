@@ -57,10 +57,9 @@ describe('AnimalProfile.vue', () => {
     vm.like('animal-id')
     vm.userId = 'user-id'
     expect(vm.seeNext).toHaveBeenCalledTimes(1)
-    expect(vm.seeNext).toHaveBeenCalledWith('animal-id')
     expect(console.info).toHaveBeenCalledTimes(1)
     expect(axios.post).toHaveBeenCalledTimes(1)
-    expect(axios.post).toHaveBeenCalledWith('animal/animal-id/like/userid/')
+    expect(axios.post).toHaveBeenCalledWith('animal/some-id/like/userid/')
   })
 
   it('should render correct name', done => {
@@ -217,15 +216,14 @@ describe('AnimalProfile.vue', () => {
 
   describe('seeNext', () => {
     it('should mark current animal as seen', (done) => {
-      let currId = 'animal-id'
-      moxios.stubRequest('/animal/animal-id/skip/userid/', resp200)
+      moxios.stubRequest('/animal/some-id/skip/userid/', resp200)
       spyOn(axios, 'post')
 
       Vue.nextTick(() => {
-        vm.seeNext(currId)
+        vm.seeNext()
         moxios.wait(() => {
           expect(axios.post).toHaveBeenCalledTimes(1)
-          expect(axios.post).toHaveBeenCalledWith('animal/animal-id/skip/userid/')
+          expect(axios.post).toHaveBeenCalledWith('animal/some-id/skip/userid/')
           done()
         })
       })

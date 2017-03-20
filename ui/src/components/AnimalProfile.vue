@@ -5,8 +5,8 @@
         <p>{{ animal.name }} is here since {{ animal.since }} and can be adopted in {{ animal.place }}.</p>
         <p v-for="(par, index) in animal.description">{{ par }}</p>
         <ul @mouseover.stop="fetchNext()">
-            <li><a href="#like" @click.prevent="like(animal.id)">Like</a></li>
-            <li><a href="#skip" @click.prevent="seeNext(animal.id)">Skip</a></li>
+            <li><a href="#like" @click.prevent="like">Like</a></li>
+            <li><a href="#skip" @click.prevent="seeNext">Skip</a></li>
         </ul>
     </div>
 </template>
@@ -58,20 +58,22 @@ export default {
         }
       })
     },
-    like: function (uid) {
+    like: function () {
+      var uid = this.animal.id
       axios.post('animal/' + uid + '/like/' + this.userId + '/')
       console.info('Liked ' + uid)  // TODO Implement notyfing user
-      this.seeNext(uid)
+      this.seeNext()
     },
-    seeNext: function (currUid) {
+    seeNext: function () {
       var $this = this
+
       function switchAnimals () {
         $this.animal = $this.next
         $this.next = null
       }
 
-      if (currUid) {
-        axios.post('animal/' + currUid + '/skip/' + this.userId + '/')
+      if (this.animal.id) {
+        axios.post('animal/' + this.animal.id + '/skip/' + this.userId + '/')
       }
 
       if (this.next === null) {
