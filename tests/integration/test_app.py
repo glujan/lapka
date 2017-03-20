@@ -8,8 +8,8 @@ from lapka import get_app
 
 class TestApp(AioHTTPTestCase):
 
-    async def get_application(self, loop):
-        return get_app(loop=loop)
+    async def get_application(self):
+        return get_app()
 
     @unittest_run_loop
     async def test_trailing_slash(self):

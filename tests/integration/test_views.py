@@ -13,8 +13,8 @@ class TestViews(AioHTTPTestCase):
     def setUpClass(cls):
         cls.json_content = 'application/json'
 
-    async def get_application(self, loop):
-        return get_app(loop=loop)
+    async def get_application(self):
+        return get_app()
 
     @unittest_run_loop
     async def test_animal_profile(self):
