@@ -49,10 +49,10 @@ class TestViews(AioHTTPTestCase):
 
     @unittest_run_loop
     async def test_skip(self):
-        req = await self.client.get('/animal/skip/some-id/')
+        req = await self.client.get('/animal/some-id/skip/some-id/')
         self.assertEqual(req.status, HTTPStatus.METHOD_NOT_ALLOWED)
 
-        req = await self.client.post('/animal/skip/some-id/')
+        req = await self.client.post('/animal/some-id/skip/some-id/')
         self.assertEqual(req.status, HTTPStatus.OK)
         self.assertEqual(req.content_type, self.json_content)
         self.assertDictEqual(json.loads(await req.text()), {})

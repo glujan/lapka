@@ -16,7 +16,7 @@ def get_app(**kwargs):
     app = web.Application(middlewares=middlewares, **kwargs)
     app.router.add_get(r'/animal/{id:[\w-]+}/', views._animal_profile)
     app.router.add_get(r'/animal/matching/{user:[\w-]+}/', views._matching)
-    app.router.add_post(r'/animal/skip/{user:[\w-]+}/', views._skip)
+    app.router.add_post(r'/animal/{id:[\w-]+}/skip/{user:[\w-]+}/', views._skip)
     app.router.add_static('/ui', Path('./ui/dist'))
     app.router.add_static('/static', Path('./ui/dist/static'))
 
