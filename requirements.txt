@@ -1,4 +1,7 @@
 aiodns
 aiohttp
+aiohttp_session
+aiohttp_session[secure]
 cchardet
+cryptography
 lxml

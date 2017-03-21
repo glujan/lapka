@@ -4,7 +4,12 @@ from pathlib import Path
 
 from aiohttp import web
 
+from aiohttp_session import setup as aios_setup
+from aiohttp_session.cookie_storage import EncryptedCookieStorage
+
 from lapka import views
+
+from secrets import token_bytes
 
 
 def get_app(**kwargs):
@@ -17,7 +22,10 @@ def get_app(**kwargs):
     app.router.add_get(r'/animal/{id:[\w-]+}/', views._animal_profile)
     app.router.add_get(r'/animal/matching/{user:[\w-]+}/', views._matching)
     app.router.add_post(r'/animal/{id:[\w-]+}/skip/{user:[\w-]+}/', views._skip)
+    app.router.add_post(r'/auth/google_token/', views._google_token)
     app.router.add_static('/ui', Path('./ui/dist'))
     app.router.add_static('/static', Path('./ui/dist/static'))
+    secret_key = token_bytes(32)
+    aios_setup(app, EncryptedCookieStorage(secret_key))
 
     return app
