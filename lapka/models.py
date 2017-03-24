@@ -9,19 +9,8 @@ import pickle
 _pickle_path = 'fetched_data.pickle'
 
 
-def _load():  # FIXME Phony storage
-    try:
-        with open(_pickle_path, 'rb') as fp:
-            _data = pickle.load(fp)
-    except FileNotFoundError:
-        _data = []
-    return _data
-
-
-class Animal:
-    """"Animals' model in a persistance storage."""
-
-    _data = []  # FIXME Phony storage
+class AnimalBase:
+    """Base class for Animals persistence."""
 
     def __init__(self, **kwargs):
         """Create an animal instance."""
@@ -34,20 +23,8 @@ class Animal:
         self.url = kwargs.pop('url', '')
         self.place = kwargs.pop('place', '')
 
-    def save(self):
-        """Store a caller's data in a persistance layer."""
-        self.remove()
-        self._data.append(self)
-
-    def remove(self):
-        """Remove a caller's data from persistence layer."""
-        try:
-            self._data.remove(self)
-        except ValueError:
-            pass
-
     def to_dict(self):
-        """Serialize a caller to a dictionary format."""
+        """Serialize an instance to a dictionary format."""
         return {
             'name': self.name,
             'id': self.a_id,
@@ -59,11 +36,51 @@ class Animal:
             'place': self.place,
         }
 
+    def save(self):
+        """Store an instance data in a persistance layer."""
+        raise NotImplementedError
+
+    def remove(self):
+        """Remove an instance data from persistence layer."""
+        raise NotImplementedError
+
+    @classmethod
+    def find(cls, animal_id):
+        """Find an animal by a given identifier."""
+        raise NotImplementedError
+
+
+class AnimalDummy(AnimalBase):
+    """"Animal dummy model using a pickle storage."""
+
+    _data = []
+
+    @staticmethod
+    def _load():
+        try:
+            with open(_pickle_path, 'rb') as fp:
+                _data = pickle.load(fp)
+        except FileNotFoundError:
+            _data = []
+        return _data
+
+    def save(self):
+        """Store an instance data in a persistance layer."""
+        self.remove()
+        self._data.append(self)
+
+    def remove(self):
+        """Remove an instance data from persistence layer."""
+        try:
+            self._data.remove(self)
+        except ValueError:
+            pass
+
     @classmethod
     def find(cls, animal_id):
         """Find an animal by a given identifier."""
         if not cls._data:
-            cls._data = _load()
+            cls._data = cls._load()
 
         try:
             animal = next(filter(lambda a: a.a_id == animal_id, cls._data))

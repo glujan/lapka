@@ -5,7 +5,7 @@ from unittest import mock
 from aiohttp.test_utils import AioHTTPTestCase, unittest_run_loop
 
 from lapka import get_app
-from lapka.models import Animal
+from lapka.models import AnimalDummy
 
 
 json_mime = 'application/json'
@@ -31,7 +31,7 @@ class TestViews(AioHTTPTestCase):
                 'Second paragraph',
             ],
         }
-        animal = Animal(**valid_data)
+        animal = AnimalDummy(**valid_data)
         animal.save()
         req = await self.client.request('GET', '/animal/{}/'.format(animal_id))
         self.assertEqual(req.status, HTTPStatus.OK)

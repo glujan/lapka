@@ -19,17 +19,17 @@ class TestLogic(unittest.TestCase, metaclass=AsyncMeta):
                 'Second paragraph',
             ],
         }
-        self.animal = models.Animal(**animal_data)
+        self.animal = models.AnimalDummy(**animal_data)
 
     async def test_find_animal(self):
         a_id = self.animal.a_id
-        with mock.patch('lapka.models.Animal.find', return_value=self.animal):
+        with mock.patch('lapka.models.AnimalDummy.find', return_value=self.animal):
             data = await views.find_animal(a_id)
             self.assertDictEqual(data, self.animal.to_dict())
 
     async def test_find_animal_invalid_id(self):
         a_id = self.animal.a_id + 'INVALID'
-        with mock.patch('lapka.models.Animal.find', return_value=None):
+        with mock.patch('lapka.models.AnimalDummy.find', return_value=None):
             data = await views.find_animal(a_id)
             self.assertDictEqual(data, {})
 

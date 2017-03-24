@@ -143,7 +143,7 @@ if __name__ == '__main__':
                                                   NaPaluchuWawPl()))
             fetched = await asyncio.gather(*tasks)
 
-        animals = [models.Animal(**data) for data in chain(*fetched)]
+        animals = [models.AnimalDummy(**data) for data in chain(*fetched)]
         print('Gathered', len(animals), 'animals')
 
         with open(models._pickle_path, 'wb') as fp:

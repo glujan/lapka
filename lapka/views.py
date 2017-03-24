@@ -6,13 +6,13 @@ from aiohttp import request as aio_req, web
 
 from aiohttp_session import get_session
 
-from lapka.models import Animal
+from lapka.models import AnimalDummy
 
 
 async def find_animal(a_id: str) -> dict:
     """Find animal with given id and return serialized data."""
     try:
-        animal = Animal.find(a_id)
+        animal = AnimalDummy.find(a_id)
         data = animal.to_dict()
     except AttributeError:
         data = {}
