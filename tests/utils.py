@@ -72,11 +72,13 @@ class AsyncMeta(type):
 
 
 class _FakeClientResponse(aiohttp.ClientResponse):
-    def __init__(self, method, url, content, status, *args):
+    def __init__(self, method, url, content, status, **kwargs):
         if isinstance(url, str):
             url = yarl.URL(url)
         self._fake_content = content
-        super().__init__(method, url, *args)
+        super().__init__(method, url, writer=None, continue100=None, timer=None,
+                         request_info=None, traces=None, session=None,
+                         loop=asyncio.get_event_loop())
         self.status = status
 
     async def read(self):
@@ -89,6 +91,6 @@ class _FakeClientResponse(aiohttp.ClientResponse):
         return self._fake_content
 
 
-def fake_response(content, method='', status=http.HTTPStatus.OK, *args):
+def fake_response(content, method='', status=http.HTTPStatus.OK, **kwargs):
     """Create a `aiohttp.ClientResponse` instance with fake content."""
-    return _FakeClientResponse(method, yarl.URL(''), content, status, *args)
+    return _FakeClientResponse(method, yarl.URL(''), content, status, **kwargs)
