@@ -107,7 +107,7 @@ describe('AnimalProfile.vue', () => {
   })
 
   describe('fetchNext', () => {
-    it('should return if there already is next', () => {
+    it('should return if there already is next', (done) => {
       next = {some: 'object'}
       spyOn(matching, 'shift').and.callThrough()
       let vm = new Constructor({
@@ -120,6 +120,7 @@ describe('AnimalProfile.vue', () => {
       Vue.nextTick(() => {
         vm.fetchNext()
         expect(matching.shift).toHaveBeenCalledTimes(0)
+        done()
       })
     })
 
@@ -127,10 +128,12 @@ describe('AnimalProfile.vue', () => {
       spyOn(matching, 'shift').and.callThrough()
       spyOn(axios, 'get').and.callThrough()
 
-      vm.fetchNext()
-      expect(matching.shift).toHaveBeenCalledTimes(1)
-      expect(axios.get).toHaveBeenCalledTimes(0)
-      done()
+      Vue.nextTick(() => {
+        vm.fetchNext()
+        expect(matching.shift).toHaveBeenCalledTimes(1)
+        expect(axios.get).toHaveBeenCalledTimes(0)
+        done()
+      })
     })
 
     it('should fetch if no next but matching with callback', (done) => {
