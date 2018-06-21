@@ -51,7 +51,7 @@ class AnimalBase:
 
 
 class AnimalDummy(AnimalBase):
-    """"Animal dummy model using a pickle storage."""
+    """Animal dummy model using a pickle storage."""
 
     _data = []
 

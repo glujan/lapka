@@ -1,6 +1,7 @@
 """Lapka is an app to help browse and adopt animals from shelters."""
 
 from pathlib import Path
+from secrets import token_bytes
 
 from aiohttp import web
 
@@ -8,8 +9,6 @@ from aiohttp_session import setup as aios_setup
 from aiohttp_session.cookie_storage import EncryptedCookieStorage
 
 from lapka import views
-
-from secrets import token_bytes
 
 
 def get_app(**kwargs):

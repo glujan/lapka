@@ -1,4 +1,0 @@
-bpython
-pudb
-tox
--r requirements.txt

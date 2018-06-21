@@ -23,7 +23,9 @@ pyenv install 3.6.0
 pyenv virtualenv $ENV_NAME $PY36       # create a virtualenv for development
 pyenv local $PY36/env/$ENV_NAME $PY36  # set both versions as your local Python
                                        # 1st for development, 2nd for Tox
-pip install -r requirements-dev.txt -c constraints.txt
+pip install pipenv
+pipenv install
+pipenv install --dev
 ```
 
 Tests, coverage, linter and other are run using _Tox_. Run all environments by
@@ -31,8 +33,6 @@ typing `tox` or choose a specific one (with `tox -e NAME`):
 
  * `py36` - run unit and integration tests, measure coverage,
  * `style` - check code and docs style, cyclomatic complexity,
- * `upgrade` - test if dependencies can be safely upgraded. Depends on test
-   unit and integration tests success!
 
 Similary, I'm using [nvm](https://github.com/creationix/nvm) to manage
 _Node.js_ versions. This is how to run JS tests:
