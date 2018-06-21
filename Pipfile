@@ -8,8 +8,8 @@ name = "pypi"
 [packages]
 
 aiohttp = "==2.0.0"
-aiohttp_session = {extras = ["secure"], version = "==1.0.1"}
-lxml = "==3.7.3"
+aiohttp-session = {extras = ["secure"], version = "==1.0.1"}
+lxml = "==4.2.1"
 aiodns = "==1.1.1"
 cchardet = "==1.1.3"
 

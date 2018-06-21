@@ -66,8 +66,7 @@ class TestShelter(unittest.TestCase, metaclass=AsyncMeta):
         mock_urls.stop()
 
     async def test__animals_urls(self):
-        animals = ['http://example.com/animal01',
-                   'http://example.com/animal02'] * 2
+        animals = ["http://example.com/animal01", "http://example.com/animal02"] * 2
 
         urls = []
         base = 'http://example.com'
@@ -112,19 +111,13 @@ class TestShelter(unittest.TestCase, metaclass=AsyncMeta):
             self.assertListEqual([], urls)
 
 
-class TestSchroniskoWroclawPl(unittest.TestCase, metaclass=AsyncMeta):
-    @classmethod
-    def setUpClass(cls):
-        fp = Path(__file__).parent / 'assets' / 'animal_01.html'
-        with open(fp, 'r') as f:
-            cls.animal = f.read()
+class TestConcreteShelter:
 
-        fp = Path(__file__).parent / 'assets' / 'animals_list_01.html'
-        with open(fp, 'r') as f:
-            cls.animals_list = f.read()
+    shelter_class = None
+    animals_urls = {"animals": [], "next_page": ""}
 
     def setUp(self):
-        self.shelter = fetch.SchroniskoWroclawPl()
+        self.shelter = self.shelter_class()
 
     def test_class_attributes(self):
         try:
@@ -136,6 +129,53 @@ class TestSchroniskoWroclawPl(unittest.TestCase, metaclass=AsyncMeta):
         url = urlparse(self.shelter.start_url)
         self.assertIn(url.scheme, ('http', 'https'))
         self.assertTrue(url.netloc)
+
+    def test__parse_invalid_html(self):
+        with self.subTest("Empty html"):
+            data = self.shelter._parse("")
+            self.assertDictEqual(data, {})
+
+        with self.subTest("Invalid HTML"):
+            data = self.shelter._parse("<html><p>Invalid</p></html>")
+            self.assertDictEqual(data, {})
+
+    async def test__animals_urls(self):
+        animals = self.animals_urls["animals"]
+        urls = []
+
+        with patch.object(ClientSession, 'get', return_value=f_resp(self.animals_list)) as mock_get:
+            async with ClientSession() as session:
+                self.shelter.session = session
+                # TODO Pyflakes doesn't support async comprehension
+                async for url in self.shelter._animals_urls():
+                    urls.append(url)
+
+            self.assertListEqual(urls, animals)
+            self.assertEqual(mock_get.call_count, 2)
+
+            mock_get.assert_any_call(self.shelter.start_url)
+            mock_get.assert_any_call(self.animals_urls["next_page"])
+
+
+class TestSchroniskoWroclawPl(TestConcreteShelter, unittest.TestCase, metaclass=AsyncMeta):
+    shelter_class = fetch.SchroniskoWroclawPl
+    animals_urls = {
+        "animals": [
+            "http://schroniskowroclaw.pl/displaywp_project/burbon-22117/",
+            "http://schroniskowroclaw.pl/displaywp_project/nelson-10117/",
+        ] * 2,
+        "next_page": "http://schroniskowroclaw.pl/zwierzeta-do-adopcji/?page=2",
+    }
+
+    @classmethod
+    def setUpClass(cls):
+        fp = Path(__file__).parent / 'assets' / 'animal_01.html'
+        with open(fp, 'r') as f:
+            cls.animal = f.read()
+
+        fp = Path(__file__).parent / 'assets' / 'animals_list_01.html'
+        with open(fp, 'r') as f:
+            cls.animals_list = f.read()
 
     def test__full_url(self):
         for url in ("/partial-url", "other-relative", "/another?p=1", "http://example.org/remote"):
@@ -159,30 +199,18 @@ class TestSchroniskoWroclawPl(unittest.TestCase, metaclass=AsyncMeta):
         data = self.shelter._parse(self.animal)
         self.assertDictEqual(data, valid_data)
 
-    def test__parse_invalid_html(self):
-        data = self.shelter._parse('')
-        self.assertDictEqual(data, {})
 
-    async def test__animals_urls(self):
-        animals = ['http://schroniskowroclaw.pl/displaywp_project/burbon-22117/',
-                   'http://schroniskowroclaw.pl/displaywp_project/nelson-10117/'] * 2
-        urls = []
+class TestNaPaluchuWawPl(TestConcreteShelter, unittest.TestCase, metaclass=AsyncMeta):
 
-        with patch.object(ClientSession, 'get', return_value=f_resp(self.animals_list)) as mock_get:
-            async with ClientSession() as session:
-                self.shelter.session = session
-                # TODO Pyflakes doesn't support async comprehension
-                async for url in self.shelter._animals_urls():
-                    urls.append(url)
+    shelter_class = fetch.NaPaluchuWawPl
+    animals_urls = {
+        "animals": [
+            "http://www.napaluchu.waw.pl/czekam_na_ciebie/wszystkie_zwierzeta_do_adopcji/011100429",
+            "http://www.napaluchu.waw.pl/czekam_na_ciebie/wszystkie_zwierzeta_do_adopcji/000801535",
+        ] * 2,
+        "next_page": "http://www.napaluchu.waw.pl/czekam_na_ciebie/wszystkie_zwierzeta_do_adopcji:2",
+    }
 
-            self.assertListEqual(urls, animals)
-            self.assertEqual(mock_get.call_count, 2)
-
-            mock_get.assert_any_call(self.shelter.start_url)
-            mock_get.assert_any_call('http://schroniskowroclaw.pl/zwierzeta-do-adopcji/?page=2')
-
-
-class TestNaPaluchuWawPl(unittest.TestCase, metaclass=AsyncMeta):
     @classmethod
     def setUpClass(cls):
         fp = Path(__file__).parent / 'assets' / 'animal_11.html'
@@ -192,20 +220,6 @@ class TestNaPaluchuWawPl(unittest.TestCase, metaclass=AsyncMeta):
         fp = Path(__file__).parent / 'assets' / 'animals_list_11.html'
         with open(fp, 'r') as f:
             cls.animals_list = f.read()
-
-    def setUp(self):
-        self.shelter = fetch.NaPaluchuWawPl()
-
-    def test_class_attributes(self):
-        try:
-            XPath(self.shelter.animal_url)
-            XPath(self.shelter.next_url)
-        except XPathSyntaxError as e:
-            self.fail(e.msg)
-
-        url = urlparse(self.shelter.start_url)
-        self.assertIn(url.scheme, ('http', 'https'))
-        self.assertTrue(url.netloc)
 
     def test__parse(self):
         valid_data = {
@@ -223,25 +237,3 @@ class TestNaPaluchuWawPl(unittest.TestCase, metaclass=AsyncMeta):
         }
         data = self.shelter._parse(self.animal)
         self.assertDictEqual(data, valid_data)
-
-    def test__parse_invalid_html(self):
-        data = self.shelter._parse('')
-        self.assertDictEqual(data, {})
-
-    async def test__animals_urls(self):
-        animals = ['http://www.napaluchu.waw.pl/czekam_na_ciebie/wszystkie_zwierzeta_do_adopcji/011100429',
-                   'http://www.napaluchu.waw.pl/czekam_na_ciebie/wszystkie_zwierzeta_do_adopcji/000801535'] * 2
-        urls = []
-
-        with patch.object(ClientSession, 'get', return_value=f_resp(self.animals_list)) as mock_get:
-            async with ClientSession() as session:
-                self.shelter.session = session
-                # TODO Pyflakes doesn't support async comprehension
-                async for url in self.shelter._animals_urls():
-                    urls.append(url)
-
-            self.assertListEqual(urls, animals)
-            self.assertEqual(mock_get.call_count, 2)
-
-            mock_get.assert_any_call(self.shelter.start_url)
-            mock_get.assert_any_call('http://www.napaluchu.waw.pl/czekam_na_ciebie/wszystkie_zwierzeta_do_adopcji:2')

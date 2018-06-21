@@ -78,8 +78,12 @@ class SchroniskoWroclawPl(Shelter):
     start_url = "http://schroniskowroclaw.pl/zwierzeta-do-adopcji/"
 
     def _parse(self, content):
+        html = etree.HTML(content)
+        if html is None:
+            return {}
+
         try:
-            doc = etree.HTML(content).xpath("//*[@class='project']")[0]
+            doc = html.xpath("//div[@class='project']")[0]
             name = doc.xpath("//div[@class='project-details']//h1/text()")[0].split(' ')[0]
             a_id, since, *other = doc.xpath("//*[@class='project-info']//span/text()")
             category = other[0] if other else None  # FIXME Normalize categories
@@ -108,8 +112,12 @@ class NaPaluchuWawPl(Shelter):
     start_url = "http://www.napaluchu.waw.pl/czekam_na_ciebie/wszystkie_zwierzeta_do_adopcji"
 
     def _parse(self, content):
+        html = etree.HTML(content)
+        if html is None:
+            return {}
+
         try:
-            doc = etree.HTML(content).xpath("//div[@class='ani_one_container']")[0]
+            doc = html.xpath("//div[@class='ani_one_container']")[0]
             name = doc.xpath("//h5/text()")[0]
             category, *_, since, a_id = doc.xpath("//div[@class='info']//span[not(@class)]/text()")
             photos = map(self._full_url, doc.xpath("//div[@id='main_image_cont']//a/@href"))
