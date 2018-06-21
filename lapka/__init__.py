@@ -13,9 +13,7 @@ from lapka import views
 
 def get_app(**kwargs):
     """Create ready to use `aiohttp.web.Application` instance with Łapka API routes."""
-    middlewares = [
-        web.normalize_path_middleware(),
-    ]
+    middlewares = [web.normalize_path_middleware()]
 
     app = web.Application(middlewares=middlewares, **kwargs)
     app.router.add_get(r'/animal/{id:[\w-]+}/', views._animal_profile)

@@ -23,10 +23,8 @@ class Shelter:
     def __init__(self, session=None):
         """Initialize a new SchroniskoWroclawPl instance."""
         self.session = session
-        self._full_url = partial(
-            urljoin,
-            '{url.scheme}://{url.netloc}/'.format(url=urlparse(self.start_url))
-        )
+        url = urlparse(self.start_url)
+        self._full_url = partial(urljoin, f"{url.scheme}://{url.netloc}/")
         """Transform partial URL to a full one. Use with instance of this class."""
 
     async def parse(self, session=None):
@@ -141,14 +139,14 @@ class NaPaluchuWawPl(Shelter):
 
 
 if __name__ == '__main__':
+
     async def _main():
         import pickle
         from itertools import chain
         from lapka import models
 
         async with aiohttp.ClientSession() as session:
-            tasks = (sh.parse(session) for sh in (SchroniskoWroclawPl(),
-                                                  NaPaluchuWawPl()))
+            tasks = (sh.parse(session) for sh in (SchroniskoWroclawPl(), NaPaluchuWawPl()))
             fetched = await asyncio.gather(*tasks)
 
         animals = [models.AnimalDummy(**data) for data in chain(*fetched)]
