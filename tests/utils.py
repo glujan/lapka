@@ -9,7 +9,6 @@ import yarl
 
 
 def _run_in_loop(coro):
-
     @functools.wraps(coro)
     def inner(self, *args, **kwargs):
         return self.loop.run_until_complete(coro(self, *args, **kwargs))
@@ -18,7 +17,6 @@ def _run_in_loop(coro):
 
 
 def _init_loop(func):
-
     @functools.wraps(func)
     def inner(self):
         val = func(self)
@@ -26,11 +24,11 @@ def _init_loop(func):
         asyncio.set_event_loop(None)
         self.loop = asyncio.new_event_loop()
         return val
+
     return inner
 
 
 def _close_loop(func):
-
     @functools.wraps(func)
     def inner(self):
         val = func(self)
@@ -40,6 +38,7 @@ def _close_loop(func):
             self.loop.run_forever()  # FIXME Is this needed?
             self.loop.close()
         return val
+
     return inner
 
 
@@ -76,9 +75,17 @@ class _FakeClientResponse(aiohttp.ClientResponse):
         if isinstance(url, str):
             url = yarl.URL(url)
         self._fake_content = content
-        super().__init__(method, url, writer=None, continue100=None, timer=None,
-                         request_info=None, traces=None, session=None,
-                         loop=asyncio.get_event_loop())
+        super().__init__(
+            method,
+            url,
+            writer=None,
+            continue100=None,
+            timer=None,
+            request_info=None,
+            traces=None,
+            session=None,
+            loop=asyncio.get_event_loop(),
+        )
         self.status = status
 
     async def read(self):

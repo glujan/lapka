@@ -7,7 +7,6 @@ from lapka import get_app
 
 
 class TestApp(AioHTTPTestCase):
-
     async def get_application(self):
         return get_app()
 

@@ -7,7 +7,6 @@ from tests.utils import AsyncMeta
 
 
 class TestGetApp(unittest.TestCase):
-
     def test_get_app(self):
         app = get_app()
         self.assertIsInstance(app, web.Application)

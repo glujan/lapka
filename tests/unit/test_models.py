@@ -7,13 +7,12 @@ from lapka.models import AnimalDummy
 
 
 class TestAnimalDummy(unittest.TestCase):
-
     def setUp(self):
         self.animal_data = {
             'name': 'Doggy',
             'id': 'uniqueid',
             'since': '2017.03.18',
-            'category': ['dog', ],
+            'category': ['dog'],
             'photos': ['photo1', 'photo2'],
             'description': ['line1', 'line2'],
             'url': 'http://example.org',

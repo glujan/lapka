@@ -12,7 +12,6 @@ json_mime = 'application/json'
 
 
 class TestViews(AioHTTPTestCase):
-
     async def get_application(self):
         return get_app()
 
@@ -26,10 +25,7 @@ class TestViews(AioHTTPTestCase):
             'place': 'Wrocław',
             'since': '2017.01.01',
             'category': 'dog',
-            'description': [
-                'First paragraph',
-                'Second paragraph',
-            ],
+            'description': ['First paragraph', 'Second paragraph'],
         }
         animal = AnimalDummy(**valid_data)
         animal.save()
@@ -65,7 +61,6 @@ class TestViews(AioHTTPTestCase):
 
 
 class TestAuth(AioHTTPTestCase):
-
     async def get_application(self):
         return get_app()
 

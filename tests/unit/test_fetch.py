@@ -32,7 +32,9 @@ class TestShelter(unittest.TestCase, metaclass=AsyncMeta):
         mock_parse = patch.object(self.shelter, '_parse', return_value={}).start()
         mock_urls = patch.object(self.shelter, '_animals_urls', side_effect=dummy_urls).start()
 
-        with patch.object(ClientSession, 'get', return_value=f_resp(self.animals_list)) as mock_get:
+        with patch.object(
+            ClientSession, 'get', return_value=f_resp(self.animals_list)
+        ) as mock_get:
             async with ClientSession() as session:
                 resp = await self.shelter.parse(session)
 
@@ -78,7 +80,9 @@ class TestShelter(unittest.TestCase, metaclass=AsyncMeta):
         self.shelter.next_url = "//a[@class='next']/@href"
         self.assertEqual(self.shelter.start_url, base)
 
-        with patch.object(ClientSession, 'get', return_value=f_resp(self.animals_list)) as mock_get:
+        with patch.object(
+            ClientSession, 'get', return_value=f_resp(self.animals_list)
+        ) as mock_get:
             async with ClientSession() as session:
                 self.shelter.session = session
                 # TODO Pyflakes doesn't support async comprehension
@@ -140,10 +144,12 @@ class TestConcreteShelter:
             self.assertDictEqual(data, {})
 
     async def test__animals_urls(self):
-        animals = self.animals_urls["animals"]
+        animals = self.animals_urls["animals"] * 2
         urls = []
 
-        with patch.object(ClientSession, 'get', return_value=f_resp(self.animals_list)) as mock_get:
+        with patch.object(
+            ClientSession, 'get', return_value=f_resp(self.animals_list)
+        ) as mock_get:
             async with ClientSession() as session:
                 self.shelter.session = session
                 # TODO Pyflakes doesn't support async comprehension
@@ -163,7 +169,7 @@ class TestSchroniskoWroclawPl(TestConcreteShelter, unittest.TestCase, metaclass=
         "animals": [
             "http://schroniskowroclaw.pl/displaywp_project/burbon-22117/",
             "http://schroniskowroclaw.pl/displaywp_project/nelson-10117/",
-        ] * 2,
+        ],
         "next_page": "http://schroniskowroclaw.pl/zwierzeta-do-adopcji/?page=2",
     }
 
@@ -189,12 +195,16 @@ class TestSchroniskoWroclawPl(TestConcreteShelter, unittest.TestCase, metaclass=
         valid_data = {
             'name': 'Nelson',
             'id': '101/17',
-            'photos': ['http://schroniskowroclaw.pl/wp-content/uploads/2017/02/DSCF9115.jpg',
-                       'http://schroniskowroclaw.pl/wp-content/uploads/2017/02/DSCF9120.jpg'],
+            'photos': [
+                'http://schroniskowroclaw.pl/wp-content/uploads/2017/02/DSCF9115.jpg',
+                'http://schroniskowroclaw.pl/wp-content/uploads/2017/02/DSCF9120.jpg',
+            ],
             'since': '18.02.2017',
             'category': 'Koty',  # TODO i18n
-            'description': ['Nelson ma 4-lata, został oddany. Duży, gruby, piękny kocur. Wykastrowany.',
-                            'Będzie do adopcji od: 4.03.2017']
+            'description': [
+                'Nelson ma 4-lata, został oddany. Duży, gruby, piękny kocur. Wykastrowany.',
+                'Będzie do adopcji od: 4.03.2017',
+            ],
         }
         data = self.shelter._parse(self.animal)
         self.assertDictEqual(data, valid_data)
@@ -207,7 +217,7 @@ class TestNaPaluchuWawPl(TestConcreteShelter, unittest.TestCase, metaclass=Async
         "animals": [
             "http://www.napaluchu.waw.pl/czekam_na_ciebie/wszystkie_zwierzeta_do_adopcji/011100429",
             "http://www.napaluchu.waw.pl/czekam_na_ciebie/wszystkie_zwierzeta_do_adopcji/000801535",
-        ] * 2,
+        ],
         "next_page": "http://www.napaluchu.waw.pl/czekam_na_ciebie/wszystkie_zwierzeta_do_adopcji:2",
     }
 
@@ -227,13 +237,16 @@ class TestNaPaluchuWawPl(TestConcreteShelter, unittest.TestCase, metaclass=Async
             'id': '1833/16',
             'photos': [
                 'http://www.napaluchu.waw.pl/files/animals_napaluchu/big/170117065222.jpg',
-                'http://www.napaluchu.waw.pl/files/animals_napaluchu/big/170117065223.jpg'],
+                'http://www.napaluchu.waw.pl/files/animals_napaluchu/big/170117065223.jpg',
+            ],
             'since': '02.10.2016',
             'category': 'Pies',  # TODO i18n
-            'description': ['Rambo to wyjątkowy pies dla wyjątkowego opiekuna.',
-                            'Ma zaledwie rok, wciąż rośnie, poznaje świat, wszystko go interesuje.',
-                            'Ze względu na domieszkę krwi charta angielskiego potrzebuje bardzo dużo ruchu.',
-                            'Skąd: Warszawa,  ul.Bokserska'],
+            'description': [
+                'Rambo to wyjątkowy pies dla wyjątkowego opiekuna.',
+                'Ma zaledwie rok, wciąż rośnie, poznaje świat, wszystko go interesuje.',
+                'Ze względu na domieszkę krwi charta angielskiego potrzebuje bardzo dużo ruchu.',
+                'Skąd: Warszawa,  ul.Bokserska',
+            ],
         }
         data = self.shelter._parse(self.animal)
         self.assertDictEqual(data, valid_data)
