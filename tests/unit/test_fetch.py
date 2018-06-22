@@ -85,9 +85,7 @@ class TestShelter(unittest.TestCase, metaclass=AsyncMeta):
         ) as mock_get:
             async with ClientSession() as session:
                 self.shelter.session = session
-                # TODO Pyflakes doesn't support async comprehension
-                async for url in self.shelter._animals_urls():
-                    urls.append(url)
+                urls = [url async for url in self.shelter._animals_urls()]
 
             self.assertListEqual(urls, animals)
             self.assertEqual(mock_get.call_count, 2)
@@ -107,9 +105,7 @@ class TestShelter(unittest.TestCase, metaclass=AsyncMeta):
         with patch.object(ClientSession, 'get', return_value=f_resp('Invalid')) as mock_get:
             async with ClientSession() as session:
                 self.shelter.session = session
-                # TODO Pyflakes doesn't support async comprehension
-                async for url in self.shelter._animals_urls():
-                    urls.append(url)
+                urls = [url async for url in self.shelter._animals_urls()]
 
             mock_get.assert_called_once_with(self.shelter.start_url)
             self.assertListEqual([], urls)
@@ -152,9 +148,7 @@ class TestConcreteShelter:
         ) as mock_get:
             async with ClientSession() as session:
                 self.shelter.session = session
-                # TODO Pyflakes doesn't support async comprehension
-                async for url in self.shelter._animals_urls():
-                    urls.append(url)
+                urls = [url async for url in self.shelter._animals_urls()]
 
             self.assertListEqual(urls, animals)
             self.assertEqual(mock_get.call_count, 2)

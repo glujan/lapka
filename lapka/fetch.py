@@ -39,11 +39,7 @@ class Shelter:
             data['url'] = url
             return data
 
-        coros = []
-        # TODO Pyflakes doesn't support async comprehension
-        async for a_url in self._animals_urls():
-            coros.append(task(a_url))
-
+        coros = [task(a_url) async for a_url in self._animals_urls()]
         return await asyncio.gather(*coros)
 
     async def _animals_urls(self):
